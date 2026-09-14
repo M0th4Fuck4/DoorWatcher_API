@@ -5,6 +5,7 @@ from models.db import EventSchema, Event, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from management import manage
+import requests, time
 
 settings = Settings()
 
@@ -26,6 +27,20 @@ def create_event(event: EventSchema):
     session.commit()
     session.refresh(new_event)
     session.close()
+    if new_event.Type == "Ouverture":
+        SHINOBI_URL = settings.get_settings().get("SHINOBI_HOST") + ":" + settings.get_settings().get("SHINOBI_PORT")
+        SHINOBI_START = SHINOBI_URL + "/" + settings.get_settings().get("SHINOBI_API_KEY") + "/monitor/" + settings.get_settings().get("SHINOBI_GROUP_KEY") + "/" + settings.get_settings().get("SHINOBI_MONITOR_ID") + "/record"
+        SHINOBI_STOP = SHINOBI_URL + "/" + settings.get_settings().get("SHINOBI_API_KEY") + "/monitor/" + settings.get_settings().get("SHINOBI_GROUP_KEY") + "/" + settings.get_settings().get("SHINOBI_MONITOR_ID") + "/stop"
+        print(SHINOBI_START)
+        response_start = requests.get(SHINOBI_START)
+        if response_start.status_code == 200:
+            print("Recording for " + str(settings.get_settings().get("SHINOBI_DURATION")) +" seconds")
+            time.sleep(settings.get_settings().get("SHINOBI_DURATION"))
+            response_stop = requests.get(SHINOBI_STOP)
+            print("Stopping record")
+            print(response_stop.status_code)
+        else:
+            print("Failed to start recording. Status: " + str(response_start.status_code))
     return {"message": "Event added successfully", "event_id": new_event.IDEvent}
 
 if __name__ == "__main__":

@@ -1,6 +1,13 @@
 from fastapi import APIRouter
 from models.settings import Settings
 from models.db import Sensor, SensorSchema, generate_token, Base, Event, EventSchema, EventType, EventTypeSchema
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+settings = Settings()
+
+engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=True)
+Session = sessionmaker(bind=engine)
 
 # Initialize the router
 router = APIRouter()
