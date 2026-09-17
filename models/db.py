@@ -53,8 +53,12 @@ class SensorSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class EventSchema(BaseModel):
-    SensorKey: str
-    Type: str
+    sKey: str
+    sName: str
+    sType: str
+    sLocation: str
+    sAction: str
+    sPourcentage: int
 
     model_config = ConfigDict(from_attributes=True)
 

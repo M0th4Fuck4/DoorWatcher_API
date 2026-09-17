@@ -18,10 +18,14 @@ app.include_router(manage.router)
 
 @app.post("/events/add/")
 def create_event(event: EventSchema):
+    print(event)
+    pass
+
+def test():
     session = Session()
     new_event = Event(
-        SensorKey=event.SensorKey,
-        Type=event.Type
+        SensorKey=event.sKey,
+        Type=event.sType
     )
     session.add(new_event)
     session.commit()
