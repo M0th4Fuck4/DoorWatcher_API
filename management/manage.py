@@ -12,7 +12,7 @@ Session = sessionmaker(bind=engine)
 # Initialize the router
 router = APIRouter()
 
-@router.get("/generate-token")
+@router.get("/generate-token/")
 def generate_token_endpoint():
     return {"token": generate_token()}
 
