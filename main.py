@@ -1,6 +1,5 @@
 from fastapi import FastAPI, BackgroundTasks
 from models.settings import Settings
-#from models.db import Sensor, SensorSchema, generate_token, Base, Event, EventSchema, EventType, EventTypeSchema
 from models.db import EventSchema, SensorSchema, Event, Base, generate_token, sensor_exist, Sensor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
