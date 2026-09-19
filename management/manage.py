@@ -30,28 +30,6 @@ def get_sensors():
     session.close()
     return {"sensors": [SensorSchema.from_orm(sensor) for sensor in sensors]}
 
-@router.post("/sensors/add/")
-def create_sensor(sensor: SensorSchema):
-    session = Session()
-    new_sensor = Sensor(
-        SensorKey=sensor.SensorKey,
-        SensorName=sensor.SensorName,
-        SensorType=sensor.SensorType,
-        SensorLocation=sensor.SensorLocation,
-        Active=sensor.Active
-    )
-    try:
-        session.add(new_sensor)
-        session.commit()
-        session.refresh(new_sensor)
-    except Exception as e:
-        session.rollback()
-        return {"message": "Sensor creation failed", "error": str(e)}
-    finally:
-        session.close()
-
-    return {"message": "Sensor added successfully", "sensor_id": new_sensor.IDSensor, "sensor_key": new_sensor.SensorKey}
-
 @router.post("/event-types/add/")
 def create_event_type(event_type: EventTypeSchema):
     session = Session()
