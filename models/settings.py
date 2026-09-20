@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
 
+    DOORWATCHER_PORT: int
     DB_TYPE: str
     DB_HOST: str
     DB_PORT: int
@@ -21,6 +22,7 @@ class Settings(BaseSettings):
     
     def get_settings(self):
         return {
+            "DOORWATCHER_PORT": self.DOORWATCHER_PORT,
             "DB_TYPE": self.DB_TYPE,
             "DB_HOST": self.DB_HOST,
             "DB_PORT": self.DB_PORT,
