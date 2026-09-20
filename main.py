@@ -1,11 +1,16 @@
 from fastapi import FastAPI, BackgroundTasks
 from models.settings import Settings
-from models.db import EventSchema, SensorSchema, Event, Base, generate_token, sensor_exist, Sensor
+from models.db import EventSchema, Videos, Event, Base, generate_token, sensor_exist, Sensor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from management import manage
 from datetime import datetime
-import requests, asyncio, os, glob
+import requests, asyncio, json
+import logging
+
+logging.basicConfig()
+logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
+logging.getLogger("sqlalchemy.pool").setLevel(logging.CRITICAL)
 
 settings = Settings()
 
@@ -14,7 +19,7 @@ SHINOBI_START = SHINOBI_URL + "/" + settings.get_settings().get("SHINOBI_API_KEY
 SHINOBI_STOP = SHINOBI_URL + "/" + settings.get_settings().get("SHINOBI_API_KEY") + "/monitor/" + settings.get_settings().get("SHINOBI_GROUP_KEY") + "/" + settings.get_settings().get("SHINOBI_MONITOR_ID") + "/stop"
 SHINOBI_LIST_VIDEO = SHINOBI_URL + "/" + settings.get_settings().get("SHINOBI_API_KEY") + "/videos/" + settings.get_settings().get("SHINOBI_GROUP_KEY") + "/" + settings.get_settings().get("SHINOBI_MONITOR_ID")
 
-engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=True)
+engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=False)
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
@@ -43,28 +48,32 @@ async def add_event(event: EventSchema, background_tasks: BackgroundTasks):
     session.commit()
     session.refresh(new_event)
     if event.sAction == "Open":
-        background_tasks.add_task(recording)
+        background_tasks.add_task(recording, new_event.IDEvent)
     return {"message": "Event added successfully", "event_id": new_event.IDEvent}
 
-async def recording():
-    print("Start recording...")
+async def recording(IDEvent: int):
+    duration = settings.get_settings().get("SHINOBI_DURATION")
+    print(f"Start recording for {duration} secs...")
     response = requests.get(SHINOBI_START)
-    print(response.text)
-    list_video(datetime.now())
-    #response = requests.get(SHINOBI_LIST_VIDEO)
-    #print(response.text)
-    await asyncio.sleep(settings.get_settings().get("SHINOBI_DURATION"))
-    response = requests.get(SHINOBI_STOP)
-    print(response.text)
-    print("Stop recording...")
+    await asyncio.sleep(2)
 
-@app.get("/videos/list/")
-async def list_video():
-    videoPath = os.path.abspath(os.path.curdir) + "/videos/" + settings.get_settings().get("SHINOBI_GROUP_KEY") + "/" + settings.get_settings().get("SHINOBI_MONITOR_ID") + "/"
-    print(videoPath)
-    files = list(filter(os.path.isfile, glob.glob(videoPath + "\*")))
-    print(files)
-    return {"Videos" : files}
+    session = Session()
+    response = json.loads(requests.get(SHINOBI_LIST_VIDEO).text)
+    videos = []
+    for video in response["videos"]:
+        videos.append(video["actionUrl"])
+    videos.sort(reverse=True)
+    new_video = Videos(
+        IDEvent=IDEvent,
+        Path=videos[0]
+    )
+    session.add(new_video)
+    session.commit()
+    session.refresh(new_video)
+
+    await asyncio.sleep(duration)
+    response = requests.get(SHINOBI_STOP)
+    print("Stop recording...")
 
 if __name__ == "__main__":
     import uvicorn
