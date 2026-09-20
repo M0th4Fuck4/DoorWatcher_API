@@ -4,7 +4,8 @@ from models.db import EventSchema, SensorSchema, Event, Base, generate_token, se
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from management import manage
-import requests, time, asyncio
+from datetime import datetime
+import requests, asyncio, os, glob
 
 settings = Settings()
 
@@ -49,12 +50,21 @@ async def recording():
     print("Start recording...")
     response = requests.get(SHINOBI_START)
     print(response.text)
-    response = requests.get(SHINOBI_LIST_VIDEO)
-    print(response.text)
-    await asyncio.sleep(1)
+    list_video(datetime.now())
+    #response = requests.get(SHINOBI_LIST_VIDEO)
+    #print(response.text)
+    await asyncio.sleep(settings.get_settings().get("SHINOBI_DURATION"))
     response = requests.get(SHINOBI_STOP)
     print(response.text)
     print("Stop recording...")
+
+@app.get("/videos/list/")
+async def list_video():
+    videoPath = os.path.abspath(os.path.curdir) + "/videos/" + settings.get_settings().get("SHINOBI_GROUP_KEY") + "/" + settings.get_settings().get("SHINOBI_MONITOR_ID") + "/"
+    print(videoPath)
+    files = list(filter(os.path.isfile, glob.glob(videoPath + "\*")))
+    print(files)
+    return {"Videos" : files}
 
 if __name__ == "__main__":
     import uvicorn
