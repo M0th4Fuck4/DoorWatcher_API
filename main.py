@@ -53,7 +53,6 @@ async def add_event(event: EventSchema, background_tasks: BackgroundTasks):
 
 async def recording(IDEvent: int):
     duration = settings.get_settings().get("SHINOBI_DURATION")
-    print(f"Start recording for {duration} secs...")
     response = requests.get(SHINOBI_START)
     await asyncio.sleep(2)
 
@@ -73,7 +72,6 @@ async def recording(IDEvent: int):
 
     await asyncio.sleep(duration)
     response = requests.get(SHINOBI_STOP)
-    print("Stop recording...")
 
 if __name__ == "__main__":
     import uvicorn
