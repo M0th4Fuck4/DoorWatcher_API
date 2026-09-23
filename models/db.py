@@ -14,7 +14,7 @@ def generate_token() -> str:
     alphabet = string.ascii_uppercase + string.digits
     while not unique:
         token = ''.join(secrets.choice(alphabet) for i in range(5)) + "-" + ''.join(secrets.choice(alphabet) for i in range(5)) + "-" + ''.join(secrets.choice(alphabet) for i in range(5)) + "-" + ''.join(secrets.choice(alphabet) for i in range(5))
-        engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=True)
+        engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=False)
         Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -24,7 +24,7 @@ def generate_token() -> str:
     return token
 
 def sensor_exist(token) -> bool:
-    engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=True)
+    engine = create_engine(settings.get_settings().get("DB_TYPE")+"://"+settings.get_settings().get("DB_USER")+":"+settings.get_settings().get("DB_PASSWORD")+"@"+settings.get_settings().get("DB_HOST")+":"+str(settings.get_settings().get("DB_PORT"))+"/"+settings.get_settings().get("DB_NAME"), echo=False)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -62,6 +62,13 @@ class Event(Base):
     SensorKey: Mapped[Sensor] = mapped_column(ForeignKey("t-sensors.SensorKey"), nullable=False)
     Type: Mapped[EventType] = mapped_column(ForeignKey("t-event-types.EventTypeName"), nullable=False)
     EventTimestamp: Mapped[str] = mapped_column(String(50), nullable=False, default=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+
+class Videos(Base):
+    __tablename__ = "t-videos"
+
+    IDVideo: Mapped[int] = mapped_column(primary_key=True)
+    IDEvent: Mapped[Event] = mapped_column(ForeignKey("t-events.IDEvent"), nullable=False)
+    Path: Mapped[str] = mapped_column(String(255), nullable=False)
 
 # --- Pydantic v2 Schema ---
 class SensorSchema(BaseModel):
