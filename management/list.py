@@ -30,15 +30,15 @@ def get_sensors():
     session.close()
     return {"sensors": [SensorSchema.from_orm(sensor) for sensor in sensors]}
 
-@router.post("/event-types/add/")
-def create_event_type(event_type: EventTypeSchema):
-    session = Session()
-    new_event_type = EventType(
-        EventTypeName=event_type.EventTypeName,
-        Active=event_type.Active
-    )
-    session.add(new_event_type)
-    session.commit()
-    session.refresh(new_event_type)
-    session.close()
-    return {"message": "Event type added successfully", "event_type_id": new_event_type.IDEventType}
+#@router.post("/event-types/add/")
+#def create_event_type(event_type: EventTypeSchema):
+#    session = Session()
+#    new_event_type = EventType(
+#        EventTypeName=event_type.EventTypeName,
+#        Active=event_type.Active
+#    )
+#    session.add(new_event_type)
+#    session.commit()
+#    session.refresh(new_event_type)
+#    session.close()
+#    return {"message": "Event type added successfully", "event_type_id": new_event_type.IDEventType}
