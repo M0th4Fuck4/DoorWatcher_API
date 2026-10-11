@@ -47,7 +47,7 @@ async def add_event(event: EventSchema, background_tasks: BackgroundTasks):
     session.add(new_event)
     session.commit()
     session.refresh(new_event)
-    if event.sAction == "Open":
+    if event.sAction == "Ouverture":
         background_tasks.add_task(recording, new_event.IDEvent)
     return {"message": "Event added successfully", "event_id": new_event.IDEvent}
 
