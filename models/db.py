@@ -62,6 +62,7 @@ class Event(Base):
     SensorKey: Mapped[Sensor] = mapped_column(ForeignKey("t-sensors.SensorKey"), nullable=False)
     Type: Mapped[EventType] = mapped_column(ForeignKey("t-event-types.EventTypeName"), nullable=False)
     EventTimestamp: Mapped[str] = mapped_column(String(50), nullable=False, default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    PowerLevel: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
 class Videos(Base):
     __tablename__ = "t-videos"

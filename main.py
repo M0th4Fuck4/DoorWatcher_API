@@ -42,7 +42,8 @@ async def add_event(event: EventSchema, background_tasks: BackgroundTasks):
 
     new_event = Event(
         SensorKey = event.sKey,
-        Type = event.sAction
+        Type = event.sAction,
+        PowerLevel = event.sPourcentage
     )
     session.add(new_event)
     session.commit()
