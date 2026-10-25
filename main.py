@@ -6,7 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from management import list
 import requests, asyncio, os, logging
 from pathlib import Path
+from twilio.rest import Client
 
+#destinataires = ['15145192211', '15148849300']
+destinataires = ['15145192211']
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
 logging.getLogger("sqlalchemy.pool").setLevel(logging.CRITICAL)
@@ -50,6 +53,8 @@ async def add_event(event: EventSchema, background_tasks: BackgroundTasks):
     session.refresh(new_event)
     if event.sAction == "Ouverture":
         background_tasks.add_task(recording, new_event.IDEvent)
+        alert(new_event.IDEvent)
+
     return {"message": "Event added successfully", "event_id": new_event.IDEvent}
 
 async def recording(IDEvent: int):
@@ -71,6 +76,14 @@ async def recording(IDEvent: int):
         session.refresh(new_video)
 
         response = requests.get(SHINOBI_STOP)
+
+async def alert(id: str):
+    client = Client(settings.get_settings().get('TWILIO_SID'), settings.get_settings().get('TWILIO_TOKEN'))
+    for num in destinataires:
+        body = 'La porte avant a été ouvert (' + id + ')'
+        message = client.messages.create(body=body, from_=settings.get_settings().get('TWILIO_SENDER'), to=num)
+        print("Message sent with SID: " + message.sid)
+    return
 
 if __name__ == "__main__":
     import uvicorn
