@@ -8,8 +8,8 @@ import requests, asyncio, os, logging
 from pathlib import Path
 from twilio.rest import Client
 
-#destinataires = ['15145192211', '15148849300']
-destinataires = ['15145192211']
+destinataires = ['15145192211', '15148849300']
+#destinataires = ['15145192211']
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
 logging.getLogger("sqlalchemy.pool").setLevel(logging.CRITICAL)
