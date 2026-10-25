@@ -80,7 +80,7 @@ async def recording(IDEvent: int):
 async def alert(id: str):
     client = Client(settings.get_settings().get('TWILIO_SID'), settings.get_settings().get('TWILIO_TOKEN'))
     for num in destinataires:
-        body = 'La porte avant a été ouvert (' + id + ')'
+        body = 'La porte avant a été ouverte (' + str(id) + ')'
         message = client.messages.create(body=body, from_=settings.get_settings().get('TWILIO_SENDER'), to=num)
         print("Message sent with SID: " + message.sid)
     return
