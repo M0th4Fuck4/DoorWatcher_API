@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     SHINOBI_GROUP_KEY: str
     SHINOBI_MONITOR_ID: str
     SHINOBI_DURATION: int
+    TWILIO_SID: str
+    TWILIO_TOKEN: str
+    TWILIO_SENDER: str
 
     # Tell Pydantic to read from a .env file
     model_config = SettingsConfigDict(env_file="utils/.env")
@@ -35,5 +38,8 @@ class Settings(BaseSettings):
             "SHINOBI_API_KEY": self.SHINOBI_API_KEY,
             "SHINOBI_GROUP_KEY": self.SHINOBI_GROUP_KEY,
             "SHINOBI_MONITOR_ID": self.SHINOBI_MONITOR_ID,
-            "SHINOBI_DURATION": self.SHINOBI_DURATION
+            "SHINOBI_DURATION": self.SHINOBI_DURATION,
+            "TWILIO_SID": self.TWILIO_SID,
+            "TWILIO_TOKEN": self.TWILIO_TOKEN,
+            "TWILIO_SENDER": self.TWILIO_SENDER
         }
