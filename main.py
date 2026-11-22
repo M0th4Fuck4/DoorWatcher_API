@@ -3,7 +3,7 @@ from models.settings import Settings
 from models.db import EventSchema, Videos, Event, Base, generate_token, sensor_exist, Sensor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from management import list
+from management import list, subscribers
 import requests, asyncio, os, logging
 from pathlib import Path
 from twilio.rest import Client
@@ -28,6 +28,7 @@ Session = sessionmaker(bind=engine)
 
 app = FastAPI(root_path="/DoorWatcherApi")
 app.include_router(list.router)
+app.include_router(subscribers.router)
 
 @app.post("/events/add/")
 async def add_event(event: EventSchema, background_tasks: BackgroundTasks):

@@ -71,6 +71,14 @@ class Videos(Base):
     IDEvent: Mapped[Event] = mapped_column(ForeignKey("t-events.IDEvent"), nullable=False)
     Path: Mapped[str] = mapped_column(String(255), nullable=False)
 
+class Subscribers(Base):
+    __tablename__ = "t-subscribers"
+
+    IDSubscriber: Mapped[int] = mapped_column(primary_key=True)
+    SubscriberName: Mapped[str] = mapped_column(String(50), nullable=False)
+    SubscriberCell: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    Active: Mapped[bool] = mapped_column(default=True)
+
 # --- Pydantic v2 Schema ---
 class SensorSchema(BaseModel):
     SensorKey: str
@@ -93,6 +101,14 @@ class EventSchema(BaseModel):
 
 class EventTypeSchema(BaseModel):
     EventTypeName: str
+    Active: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+class SubscriberSchema(BaseModel):
+    IDSubscriber: int
+    SubscriberName: str
+    SubscriberCell: str
     Active: bool
 
     model_config = ConfigDict(from_attributes=True)
