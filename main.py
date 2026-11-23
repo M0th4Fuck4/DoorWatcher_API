@@ -1,15 +1,15 @@
 from fastapi import FastAPI, BackgroundTasks
 from models.settings import Settings
-from models.db import EventSchema, Videos, Event, Base, generate_token, sensor_exist, Sensor
+from models.db import EventSchema, Videos, Event, Base, sensor_exist, Sensor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from management import list, subscribers
+from management import sensors, subscribers, events
 import requests, asyncio, os, logging
 from pathlib import Path
 from twilio.rest import Client
 
 destinataires = ['15145192211', '15148849300']
-#destinataires = ['15145192211']
+
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
 logging.getLogger("sqlalchemy.pool").setLevel(logging.CRITICAL)
@@ -27,8 +27,9 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 app = FastAPI(root_path="/DoorWatcherApi")
-app.include_router(list.router)
+app.include_router(sensors.router)
 app.include_router(subscribers.router)
+app.include_router(events.router)
 
 @app.post("/events/add/")
 async def add_event(event: EventSchema, background_tasks: BackgroundTasks):

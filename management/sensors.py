@@ -12,17 +12,6 @@ Session = sessionmaker(bind=engine)
 # Initialize the router
 router = APIRouter()
 
-@router.get("/generate-token/")
-def generate_token_endpoint():
-    return {"token": generate_token()}
-
-@router.get("/events-types/list/")
-def get_event_types():
-    session = Session()
-    event_types = session.query(EventType).filter(EventType.Active == True).all()
-    session.close()
-    return {"event_types": [EventTypeSchema.from_orm(event_type) for event_type in event_types]}
-
 @router.get("/sensors/list/")
 def get_sensors():
     session = Session()
