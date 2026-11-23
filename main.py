@@ -8,8 +8,6 @@ import requests, asyncio, os, logging
 from pathlib import Path
 from twilio.rest import Client
 
-destinataires = ['15145192211', '15148849300']
-
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
 logging.getLogger("sqlalchemy.pool").setLevel(logging.CRITICAL)
@@ -81,9 +79,10 @@ async def recording(IDEvent: int):
 
 async def alert(id: str):
     client = Client(settings.get_settings().get('TWILIO_SID'), settings.get_settings().get('TWILIO_TOKEN'))
-    for num in destinataires:
+    subscribers = Session().query(subscribers.Subscribers).filter(subscribers.Subscribers.Active == True).all()
+    for num in subscribers:
         body = 'La porte avant a été ouverte (' + str(id) + ')'
-        message = client.messages.create(body=body, from_=settings.get_settings().get('TWILIO_SENDER'), to=num)
+        message = client.messages.create(body=body, from_=settings.get_settings().get('TWILIO_SENDER'), to=num.SubscriberCell)
         print("Message sent with SID: " + message.sid)
     return
 
